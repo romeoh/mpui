@@ -44,8 +44,8 @@ Mui.fn = Mui.prototype = {
 	addClass: function(_className){
 		this[0].className.indexOf(_className)
 		if(this[0].className.indexOf(_className) == -1){
-			this[0].className += " " + _className.trim();
-			this[0].className = this[0].className.trim();
+			this[0].className += " " + _className;
+			this[0].className = mpui.trim( this[0].className );
 		}
 		if(_className == ""){
 			this[0].className = "";
@@ -58,12 +58,34 @@ Mui.fn = Mui.prototype = {
 	
 	/* animation */
 	animate: function(_option, _duration, _callback){
-		var styleText = "";
-		for(var key in _option){
-			value = eval("_option."+key);
-			if(typeof value == "number") value = value + "px";
-			
+		var  styleText = ""
+			,time = "1s"
+			,delay = "0s"
+		if(mpui(this[0]).css("position") == "static"){
+			mpui(this[0]).css("position", "relative").css("display", "block");
 		}
+		prefix = mpui.browser().prefix;
+		
+		for(var _key in _option){
+			_value = eval("_option." + _key);
+			if(_key != "onFinish"){
+				if(_key == "time"){
+					time = _value;
+					continue;
+				}
+				if(_key == "delay"){
+					delay = _value;
+					continue;
+				}
+				mpui(this[0]).css(_key, _value);
+				if(this[0].style.cssText.indexOf(_key) == -1){
+					console.log(prefix+"transform:"+_key+"("+_value+")")
+					this[0].style.cssText += prefix+"transform:"+_key+"("+_value+")";
+				}
+			}
+		}
+		this[0].style.cssText += prefix+"transition:all "+time+"s "+delay+"s"
+		console.log(this[0].style);
 	},
 	
 	append: function(_value){
@@ -290,7 +312,7 @@ Mui.fn = Mui.prototype = {
 	/* remove class */
 	removeClass: function(_classname){
 		if(_classname){
-			this[0].className = this[0].className.replace(_classname, "").trim();
+			this[0].className = mpui.trim( this[0].className.replace(_classname, "") );
 		}else{
 			this[0].className = "";
 		}
@@ -311,10 +333,10 @@ Mui.fn = Mui.prototype = {
 	/* toggleClass */
 	toggleClass: function(_className){
 		if(this[0].className.indexOf(_className) != -1){
-			this[0].className = this[0].className.replace(_className, "").trim();
+			this[0].className = mpui.trim( this[0].className.replace(_className, "") );
 		}else{
 			this[0].className += " "+_className;
-			this[0].className = this[0].className.trim();
+			this[0].className = mpui.trim( this[0].className );
 		}
 	},
 	
@@ -338,35 +360,82 @@ Mui.ajax = function(){
 /* check browser */
 Mui.browser = function(){
 	var ua = navigator.userAgent,
-		vendor = (/presto/gi).test(ua) ? "opera" : 
+		browserName = (/presto/gi).test(ua) ? "opera" : 
 					(/chrome/gi).test(ua) ? "chrome" : 
 					(/safari/gi).test(ua) ? "safari" : 
 					(/simulator/gi).test(ua) ? "ios simulator" : 
-					(/gecko/gi).test(ua) ? "firefox" : 
+					(/firefox/gi).test(ua) ? "firefox" : 
 					(/triden/gi).test(ua) ? "ie" : "other",
-		device = (/iphone|ipad|ipod/gi).test(ua) ? "ios" : (/android/gi).test(ua) ? "android" : "pc",
+		device = (/iphone|ipad|ipod/gi).test(ua) ? "mobile" : (/android/gi).test(ua) ? "mobile" : "pc",
 		os = (/iphone|ipad|ipod/gi).test(ua) ? "ios" : 
 				(/android/gi).test(ua) ? "android" :
 				(/mac/gi).test(ua) ? "macOS" : 
-				(/windows/gi).test(ua) ? "Windows" : "other";
-	switch(vendor){
+				(/windows/gi).test(ua) ? "Windows" : "other",
+		prefix = (/presto/gi).test(ua) ? "-o-" : 
+					(/webkit/gi).test(ua) ? "-webkit-" :
+					(/firefox/gi).test(ua) ? "-moz-" : 
+					(/triden/gi).test(ua) ? "-ms-" : "",
+		androidVersion, androidName;
+	switch(browserName){
 		case "opera": case "safari":
-			version = ua.match(/version\/|crios\/([0-9.]+)/ig).toString().split("/")[1];
+			try{
+				browserVer = ua.match(/version\/([0-9.]+)/ig).toString().split("/")[1];
+			}catch(err){
+				browserVer = undefined;
+			}
 		break;
 		case "chrome":
-			version = ua.match(/chrome\/([0-9.]+)/ig).toString().split("/")[1];
+			browserVer = ua.match(/chrome\/([0-9.]+)/ig).toString().split("/")[1];
 		break;
 		case "firefox":
-			version = ua.match(/firefox\/([0-9.]+)/ig).toString().split("/")[1];
+			browserVer = ua.match(/firefox\/([0-9.]+)/ig).toString().split("/")[1];
 		break;
 		case "ie":
-			version = ua.match(/MSIE ([0-9.]+)/ig).toString().split(" ")[1];
+			browserVer = ua.match(/MSIE ([0-9.]+)/ig).toString().split(" ")[1];
 		break;
 		default:
-			version = undefined;
+			browserVer = undefined;
 		break;
 	}
-	return {"vendor":vendor, "version":version, "device":device, "os":os}
+	if(os == "android"){
+		androidVersion = ua.match(/Android ([0-9.]+)/ig).toString().split(" ")[1];
+		switch(androidVersion){
+			case "1.0":
+				androidName = "applepie";
+			break;
+			case "1.1":
+				androidName = "bananabread";
+			break;
+			case "1.5":
+				androidName = "cupcake";
+			break;
+			case "1.6":
+				androidName = "donut";
+			break;
+			case "2.0": case "2.0.1": case "2.1":
+				androidName = "eclair";
+			break;
+			case "2.2": case "2.2.1": case "2.2.2":
+				androidName = "Froyo";
+			break;
+			case "2.3": case "2.3.2": case "2.3.3": case "2.3.4": case "2.3.5": case "2.3.6": case "2.3.7":
+				androidName = "gingerbread";
+			break;
+			case "3.0": case "3.1": case "3.2":
+				androidName = "honeycomb";
+			break;
+			case "4.0": case "4.0.1": case "4.0.2": case "4.0.3": case "4.0.4":
+				androidName = "icecreamsandwich";
+			break;
+			case "4.1":
+				androidName = "jellybean";
+			break;
+			default:
+				androidName = undefined;
+			break;
+		}
+	}
+	return {"device":device, "os":os, "browser":browserName, "browserVer":browserVer, "androidName":androidName, "androidVersion":androidVersion, "prefix":prefix, "ua":ua}
 },
 
 Mui.screen = function(){

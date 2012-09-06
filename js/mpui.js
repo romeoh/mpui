@@ -359,23 +359,24 @@ Mui.ajax = function(){
 
 /* check browser */
 Mui.browser = function(){
-	var ua = navigator.userAgent,
-		browserName = (/presto/gi).test(ua) ? "opera" : 
-					(/chrome/gi).test(ua) ? "chrome" : 
+	var  ua = navigator.userAgent
+		,browserName = (/chrome/gi).test(ua) ? "chrome" : 
 					(/safari/gi).test(ua) ? "safari" : 
 					(/simulator/gi).test(ua) ? "ios simulator" : 
+					(/presto/gi).test(ua) ? "opera" : 
 					(/firefox/gi).test(ua) ? "firefox" : 
-					(/triden/gi).test(ua) ? "ie" : "other",
-		device = (/iphone|ipad|ipod/gi).test(ua) ? "mobile" : (/android/gi).test(ua) ? "mobile" : "pc",
-		os = (/iphone|ipad|ipod/gi).test(ua) ? "ios" : 
+					(/triden/gi).test(ua) ? "ie" : "other"
+		,device = (/iphone|ipad|ipod|android/gi).test(ua) ? "mobile" : "pc"
+		,os = (/iphone|ipad|ipod/gi).test(ua) ? "ios" : 
 				(/android/gi).test(ua) ? "android" :
 				(/mac/gi).test(ua) ? "macOS" : 
-				(/windows/gi).test(ua) ? "Windows" : "other",
-		prefix = (/presto/gi).test(ua) ? "-o-" : 
+				(/windows/gi).test(ua) ? "Windows" : "other"
+		,prefix = (/presto/gi).test(ua) ? "-o-" : 
 					(/webkit/gi).test(ua) ? "-webkit-" :
 					(/firefox/gi).test(ua) ? "-moz-" : 
-					(/triden/gi).test(ua) ? "-ms-" : "",
-		androidVersion, androidName;
+					(/triden/gi).test(ua) ? "-ms-" : ""
+		,androidVersion
+		,androidName;
 	switch(browserName){
 		case "opera": case "safari":
 			try{
@@ -398,7 +399,7 @@ Mui.browser = function(){
 		break;
 	}
 	if(os == "android"){
-		androidVersion = ua.match(/Android ([0-9.]+)/ig).toString().split(" ")[1];
+		androidVersion = ua.match(/android ([0-9.]+)/ig).toString().split(" ")[1];
 		switch(androidVersion){
 			case "1.0":
 				androidName = "applepie";
@@ -435,7 +436,15 @@ Mui.browser = function(){
 			break;
 		}
 	}
-	return {"device":device, "os":os, "browser":browserName, "browserVer":browserVer, "androidName":androidName, "androidVersion":androidVersion, "prefix":prefix, "ua":ua}
+	return {
+		 "device":device
+		,"os":os
+		,"browser":browserName
+		,"browserVer":browserVer
+		,"androidName":androidName
+		,"androidVersion":androidVersion
+		,"prefix":prefix
+	}
 },
 
 Mui.screen = function(){

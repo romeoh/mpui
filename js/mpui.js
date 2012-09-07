@@ -61,6 +61,7 @@ Mui.fn = Mui.prototype = {
 		var  styleText = ""
 			,time = "1s"
 			,delay = "0s"
+			,cb ,cbCall
 		if(mpui(this[0]).css("position") == "static"){
 			mpui(this[0]).css("position", "relative").css("display", "block");
 		}
@@ -82,9 +83,36 @@ Mui.fn = Mui.prototype = {
 					console.log(prefix+"transform:"+_key+"("+_value+")")
 					this[0].style.cssText += prefix+"transform:"+_key+"("+_value+")";
 				}
+			}else{
+				cb = _value;
 			}
 		}
-		this[0].style.cssText += prefix+"transition:all "+time+"s "+delay+"s"
+		this[0].style.cssText += prefix+"transition:all "+time+"s "+delay+"s ;";
+		
+		function CBData(){
+			this.callbackFunction = [];
+		}
+		CBData.prototype.setCallback = function(cb){
+			this.callbackFunction = cb;
+		}
+		CBData.prototype.getCallback = function(){
+			return this.callbackFunction;
+		}
+		CBData.prototype.cb = function(evt){
+			var callCb = cbCall.getCallback();
+			if(typeof callCb == "function") callCb();
+			
+			evt.currentTarget.removeEventListener("webkitTransitionEnd", cbCall.cb, false);
+			resetMotion(evt.currentTarget);
+		}
+		function resetMotion(evt){
+			
+		}
+		
+		cbCall = new CBData();
+		if(cb) cbCall.setCallback(cb);
+		
+		this[0].addEventListener("webkitTransitionEnd", cbCall.cb, false);
 		console.log(this[0].style);
 	},
 	

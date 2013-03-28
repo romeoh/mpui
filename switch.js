@@ -14,6 +14,7 @@ var initSwitch = function(){
 	
 	for (var i=0; i<M('[data-switch]').selector.length; i++) {
 		var  nth = i + 1
+
 		if (document.querySelectorAll('[data-switch]')[i].getAttribute('data-switch') == 'on') {
 			document.querySelectorAll('[data-switch]')[i].querySelector('input').style['webkitTransform'] = 'translate3d(0,0,0)';
 			document.querySelectorAll('[data-switch]')[i].setAttribute('data-onoff', 'on');
@@ -24,36 +25,36 @@ var initSwitch = function(){
 			switchPos = rightPos;
 		}
 	}
-	
-	M('[data-switch] input')
-		.drag({
-			 'vertical': false
-			,'left': rightPos+'px'
-			,'right': '0px'
-			,'onEnd': function(evt, mp){
-				if (this.direction == 1) {
-					switchPos = rightPos;
-					mp.parent().parent().data('onoff', 'off')
-				} else if (this.direction == -1) {
-					switchPos = 0;
-					mp.parent().parent().data('onoff', 'on')
-				} else {
-					if (switchPos == 0) {
+	for (var i=1; i<M('[data-switch]').selector.length+1; i++) {
+		M('[data-switch]:nth-child('+i+') input')
+			.drag({
+				 'vertical': false
+				,'left': rightPos+'px'
+				,'right': '0px'
+				,'onEnd': function(evt, mp){
+					if (this.direction == 1) {
 						switchPos = rightPos;
 						mp.parent().parent().data('onoff', 'off')
-					} else {
+					} else if (this.direction == -1) {
 						switchPos = 0;
 						mp.parent().parent().data('onoff', 'on')
+					} else {
+						if (switchPos == 0) {
+							switchPos = rightPos;
+							mp.parent().parent().data('onoff', 'off')
+						} else {
+							switchPos = 0;
+							mp.parent().parent().data('onoff', 'on')
+						}
 					}
+					mp.animate({
+						 'x': switchPos + 'px'
+						,'time':'0.2s'
+					})
+					// 콜백
+					eval(M('[data-switch]').data('switch-callback')) (mp.parent().parent().selector[0], mp.parent().parent().data('onoff') );
 				}
-				mp.animate({
-					 'x': switchPos + 'px'
-					,'time':'0.2s'
-				})
-				// 콜백
-				eval(M('[data-switch]').data('switch-callback')) (mp.parent().parent().selector[0], mp.parent().parent().data('onoff') );
-			}
-		})
-	
+			})
+	}
 }
 initSwitch();

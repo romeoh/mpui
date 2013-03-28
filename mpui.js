@@ -22,6 +22,9 @@ Mui.fn = Mui.prototype = {
  
 	/* 초기화 */
 	init: function(_selector) {
+		if (!w.isMobile) {
+			w.isMobile = Mui.browser().device !== 'pc'
+		}
 		if (!_selector) return this;
  
 		if (typeof _selector === "string") {
@@ -259,7 +262,7 @@ Mui.fn = Mui.prototype = {
 						(_option.rotate != '') ? true : 
 						false
 			
- 
+
 		for (var i=0; i<selector.length; i++) {
 			for (var _key in _option) {
 				var _value = eval("_option." + _key)
@@ -296,7 +299,7 @@ Mui.fn = Mui.prototype = {
 				styleText += '-webkit-transform:translate3d(' + transX + ', ' + transY + ', 0) ' + transScale + transRotate;
 			}
 			selector[i].style.cssText += styleText;
- 
+
 			selector[i].addEventListener("webkitTransitionEnd", this.transEnd = function(event) {
 				if (!obj) {
 					obj = event;
@@ -315,7 +318,7 @@ Mui.fn = Mui.prototype = {
 		}
 		return this;
 	},
- 
+
 	animateStop: function(){
 		var selector = this.selector
 		for (var i=0; i<selector.length; i++) {
@@ -632,17 +635,15 @@ Mui.fn = Mui.prototype = {
  
 		dragOption.handler 	= _option.handler == undefined ? selector : d.querySelectorAll(_option.handler);
 		Mui.dragInit.mpSelector = this;
-		Mui.dragInit.mpSelectorCon = this.selector;
-		if ( M.browser().device == 'pc' ) {
-			for(var i=0; i<dragOption.handler.length; i++){
-				dragOption.handler[i].addEventListener('mousedown', Mui.dragInit, false);
-				dragOption.handler[i].dragOption = this.drag.arguments[0];
-			}
+		
+		if ( w.isMobile ) {
+			dragOption.handler[0].addEventListener('touchstart', Mui.dragInit, false);
+			dragOption.handler[0].dragOption = this.drag.arguments[0];
+			dragOption.handler[0].dragOption.target = this.selector;
 		} else {
-			for(var i=0; i<dragOption.handler.length; i++){
-				dragOption.handler[i].addEventListener('touchstart', Mui.dragInit, false);
-				dragOption.handler[i].dragOption = this.drag.arguments[0];
-			}
+			dragOption.handler[0].addEventListener('mousedown', Mui.dragInit, false);
+			dragOption.handler[0].dragOption = this.drag.arguments[0];
+			dragOption.handler[0].dragOption.target = this.selector;
 		}
 		return this;
 	},
@@ -662,8 +663,10 @@ Mui.fn = Mui.prototype = {
 Mui.eventListener = {}
  
 Mui.dragInit = function(evt){
-	var  point = hasTouch ? evt.touches[0] : evt
-		,scroller = Mui.dragInit.mpSelector
+	if (evt) {
+		var  point = hasTouch ? evt.touches[0] : evt
+			,scroller = Mui.dragInit.mpSelector
+	}
 	switch (evt.type) {
 		case 'mousedown': case 'touchstart':
 			d.dragOption = {}
@@ -686,7 +689,7 @@ Mui.dragInit = function(evt){
 			d.dragOption.onEnd 		= evt.currentTarget.dragOption.onEnd 	== undefined ? null : evt.currentTarget.dragOption.onEnd;
 			d.dragOption.onCancel 	= evt.currentTarget.dragOption.onCancel == undefined ? null : evt.currentTarget.dragOption.onCancel;
  
-			Mui.dragInit.target = Mui.dragInit.mpSelectorCon[0];
+			Mui.dragInit.target = evt.currentTarget.dragOption.target[0]
 			scroller.length = 0;
 			scroller[0] = Mui.dragInit.target
 			scroller.selector = []
@@ -711,7 +714,7 @@ Mui.dragInit = function(evt){
 			w.updown = 0;
 			w.startX = Mui.dragInit.startPos[1][0];
 			w.startY = Mui.dragInit.startPos[1][1];
- 
+
 			// scale
 			if (d.dragOption.scale != 1) {
 				scroller.css('scale', d.dragOption.scale);
@@ -759,7 +762,7 @@ Mui.dragInit = function(evt){
 			}
 			w.distanceX = Mui.dragInit.endPos[1][0] - Mui.dragInit.startPos[1][0];
 			w.distanceY = Mui.dragInit.endPos[1][1] - Mui.dragInit.startPos[1][1];
- 
+
 			if( !Mui.dragInit.firstDirection ){
 				if(Math.abs(Mui.dragInit.endPos[1][1] - Mui.dragInit.startPos[1][1]) > Math.abs(Mui.dragInit.endPos[1][0] - Mui.dragInit.startPos[1][0])){
 					Mui.dragInit.firstDirection = 'horizon';
@@ -942,10 +945,10 @@ Mui.dragInit = function(evt){
 				} else {
 					if (Mui.dragInit.endPos[1][0] - Mui.dragInit.startPos[1][0] > 0) {
 						//console.log('->');
-						w.direction = 1;
+						w.direction = -1;
 					} else if (Mui.dragInit.endPos[1][0] - Mui.dragInit.startPos[1][0] < 0) {
 						//console.log('<-');
-						w.direction = -1;
+						w.direction = 1;
 					}
 				}
 			}

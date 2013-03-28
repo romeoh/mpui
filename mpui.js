@@ -8,9 +8,7 @@
  *******************************************/
  
 (function(g, d, w, undefined) {
-var  version = "Morpheus UI 0.0.1"
-  ,tmr = new Date().getTime()
-	,tmrs = []
+var  version = "Morpheus UI 0.1.2"
 	,hasTouch = 'ontouchstart' in w || false
 	,startEvt = hasTouch ? 'touchstart' : 'mousedown'
 	,moveEvt = hasTouch ? 'touchmove' : 'mousemove'
@@ -99,23 +97,52 @@ Mui.fn = Mui.prototype = {
 	
 	/* CSS */
 	css: function(_key, _value) {
-		selector = this.selector;
+		var  selector = this.selector
+			,transScale = ''
+			,transRotate = ''
+			,transPos = ''
+			,transX = ''
+			,transY = ''
 		if (_value === undefined) {
 			if (_key == 'clientWidth') {
 				return selector[0].clientWidth;
 			} else if (_key == 'clientHeight') {
+				//console.dir(selector[0].clientHeight)
 				return selector[0].clientHeight;
+			} else if (_key == 'x') {
+				var  matrix = document.defaultView.getComputedStyle(selector[0], null).webkitTransform
+					,matrixX = matrix.substr(7, matrix.length - 8).split(', ')[4];
+				matrixX == undefined ? matrixX = '0px' : matrixX = matrixX + 'px'
+				return matrixX;
+			} else if (_key == 'y') {
+				var  matrix = document.defaultView.getComputedStyle(selector[0], null).webkitTransform
+					,matrixY = matrix.substr(7, matrix.length - 8).split(', ')[5];
+				matrixY == undefined ? matrixY = '0px' : matrixY = matrixY + 'px'
+				return matrixY;
 			} else {
 				return eval("document.defaultView.getComputedStyle(selector[0], null)."+_key);
 			}
 		} else {
 			for (var i=0; i<selector.length; i++) {
-				if (_key == 'scale' || _key == 'rotate') {
-					selector[i].style.webkitTransform = _key+'('+_value+')';
-				} else {
-					styleText = _key + "='" + _value + "'";
-					eval("selector[i].style." + styleText);
+				if (_key == 'scale') {
+					transScale = ' scale(' + _value + ') ';
+					selector[i].style['webkitTransform'] = transScale;
+					return this;
 				}
+				if (_key == 'rotate') {
+					transRotate = ' rotate(' + _value + ') ';
+					selector[i].style['webkitTransform'] += transRotate;
+					return this;
+				}
+				if (_key == 'x') {
+					selector[i].style['webkitTransform'] = 'translate3d('+_value+', 0,0)';
+				}
+				if (_key == 'y') {
+					selector[i].style['webkitTransform'] = 'translate3d(0, '+_value+', 0)';
+				}
+			
+				styleText = _key + "='" + _value + "'";
+				eval("selector[i].style." + styleText);
 			}
 			return this;
 		}
@@ -216,49 +243,89 @@ Mui.fn = Mui.prototype = {
 		var  styleText = ""
 			,time = _option.time || "1s"
 			,delay = _option.delay || "0s"
-			,callBack = _callback || ""
+			,callBack = _callback || null
 			,selector = this.selector
 			,obj
-			,prefix = mpui.browser().prefix;
-		
+			,prefix = mpui.browser().prefix
+			,transX = _option.x || this.css('x')
+			,transY = _option.y || this.css('y')
+			,transZ = _option.z || this.css('z')
+			,transScale = _option.scale || ''
+			,transRotate = _option.rotate || ''
+			,trans3d = (_option.x != '') ? true : 
+						(_option.y != '') ? true : 
+						(_option.z != '') ? true : 
+						(_option.scale != '') ? true : 
+						(_option.rotate != '') ? true : 
+						false
+			
+ 
 		for (var i=0; i<selector.length; i++) {
 			for (var _key in _option) {
-				var _value = eval("_option." + _key);
+				var _value = eval("_option." + _key)
 				
 				switch (_key) {
 					case 'scale':
-						styleText += '-webkit-transform: scale('+_value+'); ';
-						break;
+						transScale = ' scale('+_value+') ';
+						//styleText += '-webkit-transform: scale('+_value+'); ';
+					break;
 					case 'rotate':
-						styleText += '-webkit-transform: rotate('+_value+'); ';
-						break;
+						transRotate = ' rotate('+_value+') ';
+						//styleText += '-webkit-transform: rotate('+_value+'); ';
+					break;
 					case 'time': case 'delay':
-						break;
+					break;
 					default:
 						styleText += _key + ":" + _value + "; ";
-						break;
+					break;
 				}
 			}
-			styleText += "-webkit-transition:all " + time + " linear " + delay + "; ";
-			selector[i].style.cssText += styleText;
 			
+			if (callBack) {
+				this.selector[i].callback = callBack;
+			}
 			if( eval("document.defaultView.getComputedStyle(this.selector["+i+"], null).position") == "static" ){
 				this.selector[i].style.position = "relative";
 			}
-			selector[i].addEventListener("webkitTransitionEnd", function(event) {
+			styleText += "-webkit-transition:all " + time + " linear " + delay + "; ";
+			
+			if (trans3d) {
+				transX == '' ? transX = 0 : transX
+				transY == '' ? transY = 0 : transY
+				transZ == '' ? transZ = 0 : transZ
+				styleText += '-webkit-transform:translate3d(' + transX + ', ' + transY + ', 0) ' + transScale + transRotate;
+			}
+			selector[i].style.cssText += styleText;
+ 
+			selector[i].addEventListener("webkitTransitionEnd", this.transEnd = function(event) {
 				if (!obj) {
 					obj = event;
-					obj.currentTarget.style.webkitTransition = "";
+					obj.currentTarget.style['webkitTransition'] = "";
 					if (callBack !== "") {
 						id = "id" + Math.floor(Math.random()*1000000000) || '';
 						event.currentTarget.setAttribute('data-id', id);
-						eval(callBack)(event, M('[data-id="' + id + '"]'));
+						if (callBack) {
+							eval(callBack)(event, M('[data-id="' + id + '"]'));
+							delete event.currentTarget.callback;
+						}
 						event.target.removeAttribute('data-id');
 					}
 				}
 			}, false);
 		}
 		return this;
+	},
+ 
+	animateStop: function(){
+		var selector = this.selector
+		for (var i=0; i<selector.length; i++) {
+			selector[i].style['webkitTransition'] = '';
+			callback = selector[i].callback
+			if (callback) {
+				eval(callback)(undefined, selector[i].getAttribute('data-id'));
+			}
+			selector[i].removeEventListener("webkitTransitionEnd", this.transEnd, false)
+		}
 	},
  
 	/* click 이벤트 * // iOS에서 click 이벤트 0.3초 딜레이 되는 현상있음.*
@@ -308,7 +375,6 @@ Mui.fn = Mui.prototype = {
 		
 		switch(evt.type){
 			case 'mousedown': case 'touchstart':
-				WNSetVariableToStorage('timestamp', evt.timeStamp);
 				if ( M.browser().device == 'pc' ) {
 					evt.currentTarget.addEventListener("mouseup", Mui.prototype.clickHandler, evt.currentTarget.bubble);
 					evt.currentTarget.addEventListener("mousemove", Mui.prototype.clickHandler, evt.currentTarget.bubble);
@@ -370,7 +436,6 @@ Mui.fn = Mui.prototype = {
 				selector[i].setAttribute('data-eventid', id);
 			}
 			selector[i].addEventListener(_event, ids = function(evt) {
-				WNSetVariableToStorage('timestamp', evt.timeStamp);
 				eval(_callback)(evt, M('[data-eventid="'+evt.currentTarget.getAttribute('data-eventid')+'"]'));
 			}, bubble);
 			if (Mui.eventListener[id] == undefined) {
@@ -567,7 +632,7 @@ Mui.fn = Mui.prototype = {
  
 		dragOption.handler 	= _option.handler == undefined ? selector : d.querySelectorAll(_option.handler);
 		Mui.dragInit.mpSelector = this;
-		
+		Mui.dragInit.mpSelectorCon = this.selector;
 		if ( M.browser().device == 'pc' ) {
 			for(var i=0; i<dragOption.handler.length; i++){
 				dragOption.handler[i].addEventListener('mousedown', Mui.dragInit, false);
@@ -603,8 +668,8 @@ Mui.dragInit = function(evt){
 		case 'mousedown': case 'touchstart':
 			d.dragOption = {}
 			if (!evt.currentTarget.dragOption) {
-				evt.currentTarget.dragOption = {}
-			} 
+				evt.currentTarget.dragOption = {};
+			}
 			d.dragOption.vertical 	= evt.currentTarget.dragOption.vertical == undefined ? true : evt.currentTarget.dragOption.vertical;
 			d.dragOption.horizon 	= evt.currentTarget.dragOption.horizon 	== undefined ? true : evt.currentTarget.dragOption.horizon;
 			d.dragOption.scale 		= evt.currentTarget.dragOption.scale	== undefined ? 1 	: evt.currentTarget.dragOption.scale;
@@ -621,17 +686,16 @@ Mui.dragInit = function(evt){
 			d.dragOption.onEnd 		= evt.currentTarget.dragOption.onEnd 	== undefined ? null : evt.currentTarget.dragOption.onEnd;
 			d.dragOption.onCancel 	= evt.currentTarget.dragOption.onCancel == undefined ? null : evt.currentTarget.dragOption.onCancel;
  
-			Mui.dragInit.target = evt.currentTarget || evt.cuTarget
+			Mui.dragInit.target = Mui.dragInit.mpSelectorCon[0];
 			scroller.length = 0;
 			scroller[0] = Mui.dragInit.target
 			scroller.selector = []
 			scroller.selector[0] = Mui.dragInit.target
 			Mui.dragInit.startPos = [];		// [objPos, mousePos]
 			Mui.dragInit.endPos = [];
+			Mui.dragInit.lastPos = [];
 			Mui.dragInit.centerPos = [];	// [가로, 세로]
 			Mui.dragInit.firstDirection = null;
-			w.direction = 0;
-			w.updown = 0;
 			if (scroller.css('position') == 'static') {
 				scroller.css('position', 'relative')
 			}
@@ -640,10 +704,14 @@ Mui.dragInit = function(evt){
 			d.addEventListener(endEvt, Mui.dragInit, false);
 			Mui.dragInit.startPos[1] = [point.pageX, point.pageY];
 			
-			Mui.dragInit.startPos[0] = [parseFloat(scroller.css('left'))||0, parseFloat(scroller.css('top'))||0];
+			Mui.dragInit.startPos[0] = [parseFloat(scroller.css('x'))||0, parseFloat(scroller.css('y'))||0];
 			Mui.dragInit.centerPos[0] = [Mui.dragInit.startPos[0][0] - Mui.dragInit.startPos[1][0]];
 			Mui.dragInit.centerPos[1] = [Mui.dragInit.startPos[0][1] - Mui.dragInit.startPos[1][1]];
-			
+			w.direction = 0;
+			w.updown = 0;
+			w.startX = Mui.dragInit.startPos[1][0];
+			w.startY = Mui.dragInit.startPos[1][1];
+ 
 			// scale
 			if (d.dragOption.scale != 1) {
 				scroller.css('scale', d.dragOption.scale);
@@ -663,9 +731,34 @@ Mui.dragInit = function(evt){
 		break;
 		
 		case 'mousemove': case 'touchmove':
-			//tmr = new Date().getTime()
-			Mui.dragInit.endPos[0] = [parseFloat(scroller.css('left'))||0, parseFloat(scroller.css('top'))||0];
+			var  transX = ''
+				,transY = ''
+			
+			if (Mui.dragInit.endPos[1] != undefined) {
+				Mui.dragInit.lastPos[1] = Mui.dragInit.endPos[1];
+			} else {
+				Mui.dragInit.lastPos[1] = 0
+			}
+			Mui.dragInit.endPos[0] = [parseFloat(scroller.css('x'))||0, parseFloat(scroller.css('y'))||0];
 			Mui.dragInit.endPos[1] = [point.pageX, point.pageY];
+			Mui.dragInit.posDirection = Mui.dragInit.endPos[1][0] - Mui.dragInit.lastPos[1][0];
+			Mui.dragInit.posUpdown = Mui.dragInit.endPos[1][1] - Mui.dragInit.lastPos[1][1];
+			if (Mui.dragInit.posDirection > 0) {
+				w.direction = 1;
+			} else if (Mui.dragInit.posDirection < 0) {
+				w.direction = -1;
+			} else {
+				w.direction = 0;
+			}
+			if (Mui.dragInit.posUpdown > 0) {
+				w.updown = 1;
+			} else if (Mui.dragInit.posUpdown < 0) {
+				w.updown = -1;
+			} else {
+				w.updown = 0;
+			}
+			w.distanceX = Mui.dragInit.endPos[1][0] - Mui.dragInit.startPos[1][0];
+			w.distanceY = Mui.dragInit.endPos[1][1] - Mui.dragInit.startPos[1][1];
  
 			if( !Mui.dragInit.firstDirection ){
 				if(Math.abs(Mui.dragInit.endPos[1][1] - Mui.dragInit.startPos[1][1]) > Math.abs(Mui.dragInit.endPos[1][0] - Mui.dragInit.startPos[1][0])){
@@ -682,72 +775,82 @@ Mui.dragInit = function(evt){
 			if (d.dragOption.oneway){
 				if (Mui.dragInit.firstDirection == 'vertical'){
 					evt.preventDefault();
-					w.updown = 1;
-					var left = parseFloat(point.pageX) + parseFloat(Mui.dragInit.centerPos[0])
+					var  left = parseFloat(point.pageX) + parseFloat(Mui.dragInit.centerPos[0])
 					
 					// limit
 					if (d.dragOption.left && d.dragOption.right) {
 						if ( parseFloat(d.dragOption.left) < left && parseFloat(d.dragOption.right) > left ) {
-							Mui.dragInit.target.style.left = left + "px";
+							transX = left+'px';
 						}
 					} else if (d.dragOption.left) {
 						if ( parseFloat(d.dragOption.left) < left ) {
-							Mui.dragInit.target.style.left = left + "px";
+							transX = left+'px';
 						}
 					} else if (d.dragOption.right) {
 						if ( parseFloat(d.dragOption.right) > left ) {
-							Mui.dragInit.target.style.left = left + "px";
+							transX = left+'px';
 						}
 					} else {
-						Mui.dragInit.target.style.left = left + "px";
+						transX = left+'px';
 					}
 				} else if (Mui.dragInit.firstDirection == 'horizon'){
 					evt.preventDefault();
-					w.direction = 1;
 					var top = parseFloat(point.pageY) + parseFloat(Mui.dragInit.centerPos[1])
 					
 					// limit
 					if (d.dragOption.top && d.dragOption.bottom) {
 						if ( parseFloat(d.dragOption.top) < top && parseFloat(d.dragOption.bottom) > top ) {
-							Mui.dragInit.target.style.top = top + "px";
+							transY = top+'px';
 						}
 					} else if (d.dragOption.top) {
 						if ( parseFloat(d.dragOption.top) < top ) {
-							Mui.dragInit.target.style.top = top + "px";
+							transY = top+'px';
 						}
 					} else if (d.dragOption.bottom) {
 						if ( parseFloat(d.dragOption.bottom) > top ) {
-							Mui.dragInit.target.style.top = top + "px";
+							transY = top+'px';
 						}
 					} else {
-						Mui.dragInit.target.style.top = top + "px";
+						transY = top+'px';
 					}
 				}
+				
+				if (!transX){
+					transX = scroller.css('x');
+				}
+				if (!transY){
+					transY = scroller.css('y');
+				}
+				Mui.dragInit.target.style['webkitTransform'] = 'translate3d('+transX+', '+transY+', 0)'
 			} else {
 				if (d.dragOption.vertical){
 					if (Mui.dragInit.firstDirection == 'vertical') {
 						Mui.dragEnd(evt);
+						transY = scroller.css('y');
 					} else {
 						// console.log('세로');
 						evt.preventDefault();
-						w.updown = 1;
 						var top = parseFloat(point.pageY) + parseFloat(Mui.dragInit.centerPos[1])
 						
 						// limit
 						if (d.dragOption.top && d.dragOption.bottom) {
-							if ( parseFloat(d.dragOption.top) < top && parseFloat(d.dragOption.bottom) > top ) {
-								Mui.dragInit.target.style.top = top + "px";
+							if ( parseFloat(d.dragOption.top) < top && parseFloat(d.dragOption.bottom) > top) {
+								transY = top+'px';
+							} else if (parseFloat(d.dragOption.top) > top) {
+								transY = d.dragOption.top;
+							} else if (parseFloat(d.dragOption.bottom) < top) {
+								transY = d.dragOption.bottom;
 							}
 						} else if (d.dragOption.top) {
 							if ( parseFloat(d.dragOption.top) < top ) {
-								Mui.dragInit.target.style.top = top + "px";
+								transY = top+'px';
 							}
 						} else if (d.dragOption.bottom) {
 							if ( parseFloat(d.dragOption.bottom) > top ) {
-								Mui.dragInit.target.style.top = top + "px";
+								transY = top+'px';
 							}
 						} else {
-							Mui.dragInit.target.style.top = top + "px";
+							transY = top+'px';
 						}
 					}
 				}
@@ -755,47 +858,48 @@ Mui.dragInit = function(evt){
 				if (d.dragOption.horizon){
 					if (Mui.dragInit.firstDirection == 'horizon') {
 						Mui.dragEnd(evt);
+						transX = scroller.css('x');
 					} else {
-						// console.log('가로')
 						evt.preventDefault();
-						w.direction = 1;
 						var left = parseFloat(point.pageX) + parseFloat(Mui.dragInit.centerPos[0])
 						
 						// limit
 						if (d.dragOption.left && d.dragOption.right) {
 							if ( parseFloat(d.dragOption.left) < left && parseFloat(d.dragOption.right) > left ) {
-								Mui.dragInit.target.style.left = left + "px";
+								transX = left+'px'
+							} else if (parseFloat(d.dragOption.left) > left) {
+								transX = d.dragOption.left;
+							} else if (parseFloat(d.dragOption.right) < left) {
+								transX = d.dragOption.right;
 							}
 						} else if (d.dragOption.left) {
 							if ( parseFloat(d.dragOption.left) < left ) {
-								Mui.dragInit.target.style.left = left + "px";
+								transX = left+'px'
 							}
 						} else if (d.dragOption.right) {
 							if ( parseFloat(d.dragOption.right) > left ) {
-								Mui.dragInit.target.style.left = left + "px";
+								transX = left+'px'
 							}
 						} else {
-							Mui.dragInit.target.style.left = left + "px";
+							transX = left+'px';
 						}
 					}
 				}
+				
+				if (!transX){
+					transX = scroller.css('x');
+				}
+				if (!transY){
+					transY = scroller.css('y');
+				}
+				Mui.dragInit.target.style['webkitTransform'] = 'translate3d('+transX+', '+transY+', 0)';
 			}
-			//Mui.dragInit.target.style['transform'] = 'translate(' + Mui.dragInit.newX + 'px,' + Mui.dragInit.newY + 'px)';
 			if (d.dragOption.onMove) {
 				eval(d.dragOption.onMove)(evt, scroller);
 			}
-			/*if (new Date().getTime() - tmr < 100) {
-				tmrs.push(new Date().getTime() - tmr)
-			}
-			WNLog('-romeoh-', new Date().getTime() - tmr)*/
 		break;
 		
 		case 'mouseup': case 'touchend':
-			/*var avg = 0
-			for(var i=0; i<tmrs.length; i++){
-				avg += tmrs[i]
-			}
-			WNLog('-avg-', avg/tmrs.length)*/
 			//Mui.dragEnd();
 			if ( M.browser().device == 'pc' ) {
 				d.removeEventListener('mousemove', Mui.dragInit, false);
@@ -826,10 +930,10 @@ Mui.dragInit = function(evt){
 				} else {
 					if (Mui.dragInit.endPos[1][1] - Mui.dragInit.startPos[1][1] > 0) {
 						//console.log('->');
-						w.updown = -1;
+						w.updown = 1;
 					} else if(Mui.dragInit.endPos[1][1] - Mui.dragInit.startPos[1][1] < 0) {
 						//console.log('<-');
-						w.updown = 1;
+						w.updown = -1;
 					}
 				}
 				
@@ -838,16 +942,21 @@ Mui.dragInit = function(evt){
 				} else {
 					if (Mui.dragInit.endPos[1][0] - Mui.dragInit.startPos[1][0] > 0) {
 						//console.log('->');
-						w.direction = -1;
+						w.direction = 1;
 					} else if (Mui.dragInit.endPos[1][0] - Mui.dragInit.startPos[1][0] < 0) {
 						//console.log('<-');
-						w.direction = 1;
+						w.direction = -1;
 					}
 				}
 			}
-			
+			if (typeof Mui.dragInit.endPos[1] != 'undefined') {
+				w.distanceX = Mui.dragInit.endPos[1][0] - Mui.dragInit.startPos[1][0];
+				w.distanceY = Mui.dragInit.endPos[1][1] - Mui.dragInit.startPos[1][1];
+			} else {
+				w.distanceX = 0;
+				w.distanceY = 0;
+			}
 			if (d.dragOption.onEnd) {
-				//console.log(Mui.dragInit.mpSelector.selector[0])
 				eval(d.dragOption.onEnd)(evt, scroller);
 			}
 		break;
@@ -1054,8 +1163,9 @@ decamelize = function(_value) {
 	return _value.replace(/([a-z])([A-Z])/g,'$1-$2').toLowerCase();
 }
 Mui.toCurrency = function(_value) {
-	if ( isNaN(_value) ) return '';
-	if ( _value == '' ) return '';
+	if ( _value !== 0 && isNaN(_value) ) return '';
+	if (_value === 0) return 0;
+	if ( _value === '' ) return '';
 	_value = ''+_value;
 	
 	var  unit

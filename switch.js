@@ -9,12 +9,14 @@
  */
 var initSwitch = function(){
 	var  rightPos = M('[data-switch]').first().css('clientWidth') - parseInt(M('[data-switch] input').css('width')) - 1
+		,switches = M('[data-switch]').selector
 		,switchPos
 		,switchCondition
+		,switchId = []
+		,maskImg = []
 	
-	for (var i=0; i<M('[data-switch]').selector.length; i++) {
+	for (var i=0; i<switches.length; i++) {
 		var  nth = i + 1
-
 		if (document.querySelectorAll('[data-switch]')[i].getAttribute('data-switch') == 'on') {
 			document.querySelectorAll('[data-switch]')[i].querySelector('input').style['webkitTransform'] = 'translate3d(0,0,0)';
 			document.querySelectorAll('[data-switch]')[i].setAttribute('data-onoff', 'on');
@@ -24,9 +26,15 @@ var initSwitch = function(){
 			document.querySelectorAll('[data-switch]')[i].setAttribute('data-onoff', 'off');
 			switchPos = rightPos;
 		}
+		switchId.push('#'+document.querySelectorAll('[data-switch]')[i].id);
+		maskImg.push(document.querySelectorAll('[data-switch]')[i].getAttribute('data-switch-mask'));
 	}
-	for (var i=1; i<M('[data-switch]').selector.length+1; i++) {
-		M('[data-switch]:nth-child('+i+') input')
+	
+	for (var i=0; i<switches.length; i++) {
+		if (maskImg[i]) {
+			M(switchId[i]).css('webkitMaskImage', 'url("'+maskImg[i]+'")');
+		}
+		M(switchId[i] + ' input')
 			.drag({
 				 'vertical': false
 				,'left': rightPos+'px'
@@ -57,4 +65,4 @@ var initSwitch = function(){
 			})
 	}
 }
-initSwitch();
+//initSwitch();

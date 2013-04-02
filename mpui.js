@@ -1,5 +1,5 @@
 /********************************************
- * mpui.js 
+ * mpui.js
  * morpheus UI Framework
  * Author : 백국경 (romeoh@uracle.co.kr)
  * Copyright © 2013 Uracle Co., Ltd. 
@@ -80,7 +80,7 @@ Mui.fn = Mui.prototype = {
 		}
 		return this;
 	},
-
+	
 	/* hasClass */
 	hasClass: function(_className) {
 		selector = this.selector;
@@ -97,7 +97,7 @@ Mui.fn = Mui.prototype = {
 			}
 		}
 	},
-
+	
 	/* CSS */
 	css: function(_key, _value) {
 		var  selector = this.selector
@@ -143,7 +143,7 @@ Mui.fn = Mui.prototype = {
 				if (_key == 'y') {
 					selector[i].style['webkitTransform'] = 'translate3d(0, '+_value+', 0)';
 				}
-
+			
 				styleText = _key + "='" + _value + "'";
 				eval("selector[i].style." + styleText);
 			}
@@ -173,7 +173,7 @@ Mui.fn = Mui.prototype = {
 		}
 		return this;
 	},
-
+	
 	/* remove attributes */
 	removeAttr: function(_key) {
 		selector = this.selector;
@@ -182,7 +182,7 @@ Mui.fn = Mui.prototype = {
 		}
 		return this;
 	},
-
+	
 	/* get/set attributes */
 	val: function(_value) {
 		selector = this.selector;
@@ -261,12 +261,12 @@ Mui.fn = Mui.prototype = {
 						(_option.scale != '') ? true : 
 						(_option.rotate != '') ? true : 
 						false
-
+			
 
 		for (var i=0; i<selector.length; i++) {
 			for (var _key in _option) {
 				var _value = eval("_option." + _key)
-
+				
 				switch (_key) {
 					case 'scale':
 						transScale = ' scale('+_value+') ';
@@ -283,7 +283,7 @@ Mui.fn = Mui.prototype = {
 					break;
 				}
 			}
-
+			
 			if (callBack) {
 				this.selector[i].callback = callBack;
 			}
@@ -291,7 +291,7 @@ Mui.fn = Mui.prototype = {
 				this.selector[i].style.position = "relative";
 			}
 			styleText += "-webkit-transition:all " + time + " linear " + delay + "; ";
-
+			
 			if (trans3d) {
 				transX == '' ? transX = 0 : transX
 				transY == '' ? transY = 0 : transY
@@ -351,7 +351,7 @@ Mui.fn = Mui.prototype = {
 		return this;
 	},
 	/**/
-
+	
 	/* click 이벤트 */
 	click: function(_callback, _bubble) {
 		selector = this.selector;
@@ -363,7 +363,7 @@ Mui.fn = Mui.prototype = {
 				selector[i].callback = []
 			}
 			selector[i].callback.push(_callback);
-
+			
 			if ( M.browser().device == 'pc' ) {
 				selector[i].addEventListener("mousedown", Mui.prototype.clickHandler, bubble);
 			} else {
@@ -372,10 +372,10 @@ Mui.fn = Mui.prototype = {
 		}
 		return this;
 	},
-
+	
 	clickHandler: function(evt){
 		var id
-
+		
 		switch(evt.type){
 			case 'mousedown': case 'touchstart':
 				if ( M.browser().device == 'pc' ) {
@@ -385,7 +385,7 @@ Mui.fn = Mui.prototype = {
 					evt.currentTarget.addEventListener("touchend", Mui.prototype.clickHandler, evt.currentTarget.bubble);
 					evt.currentTarget.addEventListener("touchmove", Mui.prototype.clickHandler, evt.currentTarget.bubble);
 				}
-
+				
 				id = "id" + Math.floor(Math.random() * 1000000000) || '';
 				evt.currentTarget.setAttribute('data-click-event-id', id)
 				this.muiSelector = '[data-click-event-id="' + id + '"]';
@@ -410,13 +410,13 @@ Mui.fn = Mui.prototype = {
 					evt.currentTarget.removeEventListener("touchend", Mui.prototype.clickHandler, evt.currentTarget.bubble);
 				}
 				this.end = [];
-
+				
 				try {
 					this.end = [evt.touches[0].pageX, evt.touches[0].pageY];
 				} catch(err) {
 					this.end = [evt.pageX, evt.pageY];
 				}
-
+				
 				//for (var i=0; i<evt.currentTarget.callback.length; i++) {
 					eval(evt.currentTarget.callback[0]) (evt, Mui(this.muiSelector));
 				//}
@@ -425,14 +425,14 @@ Mui.fn = Mui.prototype = {
 		}
 	},
 	/**/
-
+	
 	/* event bind */
 	on: function(_event, _callback, _bubble) {
 		var  selector = this.selector
 			,events = []
 			,bubble = _bubble || false
 			,id
-
+			
 		for (var i=0; i<selector.length; i++) {
 			if (selector[i].getAttribute('data-eventid') == undefined) {
 				id = "id" + Math.floor(Math.random()*1000000000) || '';
@@ -449,7 +449,7 @@ Mui.fn = Mui.prototype = {
 		}
 		return this;
 	},
-
+	
 	/* event unbind */
 	off: function(_event) {
 		selector = this.selector;
@@ -466,7 +466,7 @@ Mui.fn = Mui.prototype = {
 		}
 		return this;
 	},
-
+	
 	/* focus / blur */
 	focus: function(_callback) {
 		selector = this.selector;
@@ -478,7 +478,7 @@ Mui.fn = Mui.prototype = {
 		}
 		return this;
 	},
-
+	
 	/* focus */
 	blur: function(_callback) {
 		selector = this.selector;
@@ -490,12 +490,12 @@ Mui.fn = Mui.prototype = {
 		}
 		return this;
 	},
-
+	
 	/* Traversal */
 	children: function() {
 		var  childNodes = this.selector[0].childNodes
 			,nodes = '';
-
+			
 		for (var i=0; i<childNodes.length; i++) {
 			if (childNodes[i].nodeType == '1') {
 				nodes = nodes + ', ' + Mui.selector +" "+ childNodes[i].nodeName;
@@ -504,34 +504,34 @@ Mui.fn = Mui.prototype = {
 		nodes = nodes.replace(',', '');
 		return Mui( nodes );
 	},
-
+	
 	parent: function() {
 		return Mui.prototype.traversal(this.selector[0].parentNode);
 	},
-
+	
 	first: function(){
 		return Mui.prototype.traversal(this.selector[0].firstElementChild);
 	},
-
+	
 	next: function() {
 		return Mui.prototype.traversal(this.selector[0].nextElementSibling);
 	},
-
+	
 	last: function(){
 		return Mui.prototype.traversal(this.selector[0].lastElementChild);
 	},
-
+	
 	prev: function() {
 		return Mui.prototype.traversal(this.selector[0].previousElementSibling);
 	},
-
+	
 	find: function(_elem) {
 		this.selector = this.selector[0].querySelectorAll(_elem);
 		Mui.selector = _elem;
 		Mui.that = this;
 		return this;
 	},
-
+	
 	traversal: function(_childNodes) {
 		if (_childNodes.id == '') {
 			id = "id" + Math.floor(Math.random()*1000000000) || ''
@@ -544,57 +544,57 @@ Mui.fn = Mui.prototype = {
 			return Mui( '#'+_childNodes.id );
 		}
 	},
-
+	
 	// DOM Insertion
 	append: function(_elem, _option){
 		var  elem = Mui(Mui.selector)
 			,appendEle = d.createElement(_elem)
-
+			
 		elem.selector[0].appendChild(Mui.prototype.createElement(_elem, _option));
 		return this;
 	},
-
+	
 	prepend: function(_elem, _option){
 		var  elem = Mui(Mui.selector)
 			,appendEle = d.createElement(_elem)
-
+		
 		elem.selector[0].insertBefore(Mui.prototype.createElement(_elem, _option), elem.selector[0].childNodes[0]);
 		return this;
 	},
-
+	
 	before: function(_elem, _option){
 		var  elem = Mui(Mui.selector)
 			,parentEle = elem.selector[0].parentElement
 			,appendEle = d.createElement(_elem)
-
+			
 		parentEle.insertBefore(Mui.prototype.createElement(_elem, _option), elem.selector[0]);
 		return this;
 	},
-
+	
 	after: function(_elem, _option){
 		var  elem = Mui(Mui.selector)
 			,parentEle = elem.selector[0].parentElement
-
+		
 		parentEle.insertBefore(Mui.prototype.createElement(_elem, _option), elem.selector[0].nextSibling);
 		return this;
 	},
-
+	
 	insertAfter: function(_elem){
 		var  elem = Mui(Mui.selector)
 			,parentEle = elem.selector[0].parentElement
-
+		
 		parentEle.insertBefore(d.querySelector(Mui.selector), d.querySelector(_elem).nextSibling);
 		return this;
 	},
-
+	
 	insertBefore: function(_elem){
 		var  elem = Mui(Mui.selector)
 			,parentEle = elem.selector[0].parentElement
-
+		
 		parentEle.insertBefore(d.querySelector(Mui.selector), d.querySelector(_elem));
 		return this;
 	},
-
+	
 	createElement : function(_elem, _option){
 		var appendEle = d.createElement(_elem);
 		for(var name in _option){
@@ -614,7 +614,7 @@ Mui.fn = Mui.prototype = {
 		var  elem = Mui(Mui.selector)
 			,selector = this.selector
 			,childNodes = elem.selector[0].parentNode
-
+		
 		for (var i=0; i<selector.length; i++) {
 			childNodes.removeChild(selector[i]);
 		}
@@ -625,7 +625,7 @@ Mui.fn = Mui.prototype = {
 	drag: function(_option) {
 		var  selector = this.selector
 			,dragOption = {}
-
+		
 		if (!d.dragOption) {
 			d.dragOption = {}
 		}
@@ -635,7 +635,7 @@ Mui.fn = Mui.prototype = {
  
 		dragOption.handler 	= _option.handler == undefined ? selector : d.querySelectorAll(_option.handler);
 		Mui.dragInit.mpSelector = this;
-
+		
 		if ( w.isMobile ) {
 			dragOption.handler[0].addEventListener('touchstart', Mui.dragInit, false);
 			dragOption.handler[0].dragOption = this.drag.arguments[0];
@@ -651,10 +651,10 @@ Mui.fn = Mui.prototype = {
 	/* drag and drop */
 	stopDrag: function() {
 		var  selector = this.selector
-		if ( M.browser().device == 'pc' ) {
-			selector[0].removeEventListener('mousedown', Mui.dragInit, false);
-		} else {
+		if ( w.isMobile ) {
 			selector[0].removeEventListener('touchstart', Mui.dragInit, false);
+		} else {
+			selector[0].removeEventListener('mousedown', Mui.dragInit, false);
 		}
 		return this;
 	}
@@ -683,7 +683,7 @@ Mui.dragInit = function(evt){
 			d.dragOption.right 		= evt.currentTarget.dragOption.right 	== undefined ? null : evt.currentTarget.dragOption.right;
 			d.dragOption.top 		= evt.currentTarget.dragOption.top 		== undefined ? null : evt.currentTarget.dragOption.top;
 			d.dragOption.bottom 	= evt.currentTarget.dragOption.bottom 	== undefined ? null : evt.currentTarget.dragOption.bottom;
-
+			
 			d.dragOption.onStart 	= evt.currentTarget.dragOption.onStart 	== undefined ? null : evt.currentTarget.dragOption.onStart;
 			d.dragOption.onMove 	= evt.currentTarget.dragOption.onMove 	== undefined ? null : evt.currentTarget.dragOption.onMove;
 			d.dragOption.onEnd 		= evt.currentTarget.dragOption.onEnd 	== undefined ? null : evt.currentTarget.dragOption.onEnd;
@@ -706,7 +706,7 @@ Mui.dragInit = function(evt){
 			d.addEventListener(moveEvt, Mui.dragInit, false);
 			d.addEventListener(endEvt, Mui.dragInit, false);
 			Mui.dragInit.startPos[1] = [point.pageX, point.pageY];
-
+			
 			Mui.dragInit.startPos[0] = [parseFloat(scroller.css('x'))||0, parseFloat(scroller.css('y'))||0];
 			Mui.dragInit.centerPos[0] = [Mui.dragInit.startPos[0][0] - Mui.dragInit.startPos[1][0]];
 			Mui.dragInit.centerPos[1] = [Mui.dragInit.startPos[0][1] - Mui.dragInit.startPos[1][1]];
@@ -732,11 +732,11 @@ Mui.dragInit = function(evt){
 				eval(d.dragOption.onStart)(point, scroller);
 			}
 		break;
-
+		
 		case 'mousemove': case 'touchmove':
 			var  transX = ''
 				,transY = ''
-
+			
 			if (Mui.dragInit.endPos[1] != undefined) {
 				Mui.dragInit.lastPos[1] = Mui.dragInit.endPos[1];
 			} else {
@@ -773,13 +773,13 @@ Mui.dragInit = function(evt){
 					Mui.dragInit.firstDirection = 'all';
 				}
 			}
-
+			
 			// oneway option
 			if (d.dragOption.oneway){
 				if (Mui.dragInit.firstDirection == 'vertical'){
 					evt.preventDefault();
 					var  left = parseFloat(point.pageX) + parseFloat(Mui.dragInit.centerPos[0])
-
+					
 					// limit
 					if (d.dragOption.left && d.dragOption.right) {
 						if ( parseFloat(d.dragOption.left) < left && parseFloat(d.dragOption.right) > left ) {
@@ -799,7 +799,7 @@ Mui.dragInit = function(evt){
 				} else if (Mui.dragInit.firstDirection == 'horizon'){
 					evt.preventDefault();
 					var top = parseFloat(point.pageY) + parseFloat(Mui.dragInit.centerPos[1])
-
+					
 					// limit
 					if (d.dragOption.top && d.dragOption.bottom) {
 						if ( parseFloat(d.dragOption.top) < top && parseFloat(d.dragOption.bottom) > top ) {
@@ -817,7 +817,7 @@ Mui.dragInit = function(evt){
 						transY = top+'px';
 					}
 				}
-
+				
 				if (!transX){
 					transX = scroller.css('x');
 				}
@@ -834,7 +834,7 @@ Mui.dragInit = function(evt){
 						// console.log('세로');
 						evt.preventDefault();
 						var top = parseFloat(point.pageY) + parseFloat(Mui.dragInit.centerPos[1])
-
+						
 						// limit
 						if (d.dragOption.top && d.dragOption.bottom) {
 							if ( parseFloat(d.dragOption.top) < top && parseFloat(d.dragOption.bottom) > top) {
@@ -857,7 +857,7 @@ Mui.dragInit = function(evt){
 						}
 					}
 				}
-
+				
 				if (d.dragOption.horizon){
 					if (Mui.dragInit.firstDirection == 'horizon') {
 						Mui.dragEnd(evt);
@@ -865,7 +865,7 @@ Mui.dragInit = function(evt){
 					} else {
 						evt.preventDefault();
 						var left = parseFloat(point.pageX) + parseFloat(Mui.dragInit.centerPos[0])
-
+						
 						// limit
 						if (d.dragOption.left && d.dragOption.right) {
 							if ( parseFloat(d.dragOption.left) < left && parseFloat(d.dragOption.right) > left ) {
@@ -888,7 +888,7 @@ Mui.dragInit = function(evt){
 						}
 					}
 				}
-
+				
 				if (!transX){
 					transX = scroller.css('x');
 				}
@@ -901,15 +901,16 @@ Mui.dragInit = function(evt){
 				eval(d.dragOption.onMove)(evt, scroller);
 			}
 		break;
-
+		
 		case 'mouseup': case 'touchend':
 			//Mui.dragEnd();
-			if ( M.browser().device == 'pc' ) {
-				d.removeEventListener('mousemove', Mui.dragInit, false);
-				d.removeEventListener('mouseup', Mui.dragInit, false);
-			} else {
+			if ( w.isMobile ) {
 				d.removeEventListener('touchmove', Mui.dragInit, false);
 				d.removeEventListener('touchend', Mui.dragInit, false);
+			} else {
+				d.removeEventListener('mousemove', Mui.dragInit, false);
+				d.removeEventListener('mouseup', Mui.dragInit, false);
+				
 			}
  
 			// reset
@@ -923,7 +924,7 @@ Mui.dragInit = function(evt){
 			if (d.dragOption.css != 1) {
 				scroller.removeClass(d.dragOption.css);
 			}
-
+			
 			if (Mui.dragInit.endPos.length == 0) {
 				w.direction = 0;
 				w.updown = 0;
@@ -939,7 +940,7 @@ Mui.dragInit = function(evt){
 						w.updown = -1;
 					}
 				}
-
+				
 				if ( Mui.dragInit.firstDirection == 'horizon' ) {
 					w.direction = 0;
 				} else {
@@ -969,7 +970,7 @@ Mui.dragInit = function(evt){
 Mui.dragEnd = function(evt){
 	d.removeEventListener(moveEvt, Mui.dragInit, false);
 	d.removeEventListener(endEvt, Mui.dragInit, false);
-
+	
 	// reset
 	if (d.dragOption.scale != 1) {
 		scroller.css('scale', 1);
@@ -998,17 +999,17 @@ Mui.ajax = function(_option) {
 		,error = _option.error || null
 		//,data = _option.data || ''
 		//,cache = _option.cache || ''
-
+	
 	// 접속시도
 	if(beforeSend){
 		eval(beforeSend)();
 	}
-
+	
 	xhr.open(type, url, async);
 	xhr.onreadystatechange = function(){
 		if (xhr.readyState == 4) {
 			eval (success) (xhr.responseText);
-
+			
 			// 접속 완료
 			if(complete){
 				eval(complete)();
@@ -1170,11 +1171,11 @@ Mui.toCurrency = function(_value) {
 	if (_value === 0) return 0;
 	if ( _value === '' ) return '';
 	_value = ''+_value;
-
+	
 	var  unit
 		,point = _value.split('.')[1]
 		,amountStr
-
+		
 	if( !Mui.isNumber(_value.substr(0, 1)) ) {
 		unit = _value.substr(0, 1);
 		_value = parseFloat(_value.replace(unit, ''));
@@ -1213,7 +1214,7 @@ Mui.toNumber = function(_value) {
 Mui.format = function(_value, _format) {
 	var  str = ''
 		,j = 0
-
+		
 	for(var i=0; i<_format.length; i++){
 		if( _format.substr(i, 1) == "0") {
 			str += _value.substr(j, 1);

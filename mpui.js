@@ -1236,7 +1236,16 @@ Mui.scroll = function(vscroll, hscroll){
 Mui.getUrl = function(){
 	return d.URL.split('/html/')[1].split('?')[0];
 }
- 
+
+Mui.storage = function(key, value){
+	if (value == undefined) {
+		// getter
+		return localStorage.getItem(key);
+	}
+	//setter
+	localStorage.setItem(key, value);
+}
+
 /* parameter from url */
 Mui.getParameter = function(_key) {
 	address = location.href;

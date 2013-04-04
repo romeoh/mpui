@@ -144,9 +144,7 @@ Mui.fn = Mui.prototype = {
 				if (_key == 'y') {
 					selector[i].style['webkitTransform'] = 'translate3d(0, '+_value+', 0)';
 				}
-			
-				styleText = _key + "='" + _value + "'";
-				eval("selector[i].style." + styleText);
+				selector[i].style[_key] = _value;
 			}
 			return this;
 		}

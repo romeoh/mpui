@@ -123,7 +123,8 @@ Mui.fn = Mui.prototype = {
 				matrixY == undefined ? matrixY = '0px' : matrixY = matrixY + 'px'
 				return matrixY;
 			} else {
-				return eval("document.defaultView.getComputedStyle(selector[0], null)."+_key);
+				style = document.defaultView.getComputedStyle(selector[0], null);
+				return w['style'][_key];
 			}
 		} else {
 			for (var i=0; i<selector.length; i++) {
@@ -265,16 +266,13 @@ Mui.fn = Mui.prototype = {
 
 		for (var i=0; i<selector.length; i++) {
 			for (var _key in _option) {
-				var _value = eval("_option." + _key)
-				
+				var _value = _option[_key];
 				switch (_key) {
 					case 'scale':
 						transScale = ' scale('+_value+') ';
-						//styleText += '-webkit-transform: scale('+_value+'); ';
 					break;
 					case 'rotate':
 						transRotate = ' rotate('+_value+') ';
-						//styleText += '-webkit-transform: rotate('+_value+'); ';
 					break;
 					case 'time': case 'delay':
 					break;
@@ -287,10 +285,11 @@ Mui.fn = Mui.prototype = {
 			if (callBack) {
 				this.selector[i].callback = callBack;
 			}
-			if( eval("document.defaultView.getComputedStyle(this.selector["+i+"], null).position") == "static" ){
+			var style = document.defaultView.getComputedStyle(this.selector[i], null)
+			if( style['position'] == "static" ){
 				this.selector[i].style.position = "relative";
 			}
-			styleText += "-webkit-transition:all " + time + " linear " + delay + "; ";
+			styleText += "-webkit-transition:all " + time + " ease " + delay + "; ";
 			
 			if (trans3d) {
 				transX == '' ? transX = 0 : transX

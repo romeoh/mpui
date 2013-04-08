@@ -205,10 +205,12 @@ var initTabmenu = function() {
 			 opacity: '1'
 			,time:'0.2s'
 		})
-		M('[data-button-show="false"]').animate({
-			 opacity: '0'
-			,time:'0.2s'
-		})
+		if (M('[data-button-show="false"]').selector.length > 0) {
+			M('[data-button-show="false"]').animate({
+				 opacity: '0'
+				,time:'0.2s'
+			})
+		}
 		M('[data-show="false"]').animate({
 			 opacity: '0'
 			,time:'0.2s'

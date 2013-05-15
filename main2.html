@@ -52,7 +52,7 @@ function ready(){
 	M('body').on('touchstart', function(evt, mp){
 		startPos = evt.pageY
 	})
-	M('body').on('touchend', function(evt, mp){
+	M('body').on('move', function(evt, mp){
 		endPos = evt.pageY;
 	})
 	// goTop버튼

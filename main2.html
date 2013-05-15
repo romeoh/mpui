@@ -50,10 +50,10 @@ function ready(){
 	mode1();
 	window.addEventListener('scroll', scrollHandler, false);
 	M('body').on('touchstart', function(evt, mp){
-		startPos = evt.pageY
+		startPos = evt.touches[0].pageY || evt.pageY
 	})
 	M('body').on('move', function(evt, mp){
-		endPos = evt.pageY;
+		endPos = evt.touches[0].pageY || evt.pageY;
 	})
 	// goTop버튼
 	M('#goTop').on('click', function(){

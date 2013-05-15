@@ -1,0 +1,148 @@
+
+<!DOCTYPE HTML>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>Morpheus</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, target-densitydpi=medium-dpi"/>  
+<style type="text/css">
+p {border:1px solid black; padding:50px;}
+footer {position:fixed; bottom:0; left:0; background:yellow; width:100%;}
+footer li {width:80px; height:80px; float:left; margin-left:20px; text-align:center; color:white;}
+footer.blue li {background:blue}
+footer.green li {background:green}
+#goTop {position:fixed; bottom:0; right:0; background:pink; width:50px; height:30px; display:none}
+</style>
+</head>
+<body>
+
+<div>
+	<p>리스트</p>
+	<p><a href="http://d.pr/f/RPU9">다운로드</a></p>
+	<p>리스트</p>
+	<p>리스트</p>
+	<p>리스트</p>
+	<p>리스트</p>
+	<p>리스트</p>
+	<p>리스트</p>
+	<p>리스트</p>
+	<p>리스트</p>
+	<p>리스트</p>
+	<p>리스트</p>
+</div>
+
+<footer class="blue">
+	<ul>
+		<li>menu</li>
+		<li>menu</li>
+		<li>menu</li>
+	</ul>
+</footer>
+
+<div id="goTop">^ top</div>
+
+
+<script type="text/javascript" src="mpui.js"></script>
+<script type="text/javascript">
+
+var startPos, endPos
+function ready(){
+	mode1();
+	window.addEventListener('scroll', scrollHandler, false);
+	M('body').on('touchstart', function(evt, mp){
+		startPos = evt.pageY
+	})
+	M('body').on('touchend', function(evt, mp){
+		endPos = evt.pageY;
+	})
+	// goTop버튼
+	M('#goTop').on('click', function(){
+		M.scroll(0)
+	})
+}
+
+// 화면 스크롤 완료 
+// mobile의 경우 스크롤이 끝나는 시점에 한번 호출된다.
+// PC는 스크롤 되는시점에 반복해서 호출한다.
+function scrollHandler(){
+	var changePos = startPos - endPos
+	
+	if (changePos > 0) {
+		mode2();
+	} else {
+		mode1();
+	}
+}
+
+// 아이콘과 메뉴명이 보임
+function mode1() {
+	M('footer').css('display', 'block');
+	M('#goTop').css('display', 'none');
+}
+
+// top버튼만 보임
+function mode2() {
+	M('footer').css('display', 'none');
+	M('#goTop').css('display', 'block');
+}
+
+/**
+ * 페이지가 시작될때 호출된다.
+ * (실제적으로 페이지가 완전히 로드후 불려진다)
+ */
+function onInitPage(){
+	ready();
+}
+// 모피어스 플랫폼에서 사용시 window.load이벤트 리스너는 삭제하고,
+// onInitPage를 사용한다.
+window.addEventListener('load', onInitPage, false);
+
+/**
+ * 페이지가 숨겨 질때 호출된다.
+ * (실제적으로 다음 화면으로 이동시 페이지가 숨겨질때 불려진다)
+ */
+function onHidePage() {
+}
+
+/**
+ * 페이지가 복원 될때 호출된다.
+ * (히스토리 스택에 쌓여있는 페이지(액티비티)가 복원 될때 호출된다)
+ */
+function onRestorePage() {
+}  
+
+/**
+ * 페이지가 제거 될때 호출된다.
+ * (스택에 있는 현재 페이지(액티비티)가 제거 될때 호출된다.
+ */
+function onDestroyPage() {
+}
+
+/**
+ * 이전 화면으로 이동
+ * 하드웨어 Back 이벤트가 있는 경우 호출된다.(안드로이드)
+ */
+function onHistoryBackPage() {
+	WNBackPage("", "DEFAULT");
+}
+
+/**
+ * 네트워크 에러 처리
+ */
+function onHandlingNetworkError(callerServerName, trCode, errCode, errMessage) {
+}
+
+/**
+ *  화면 이벤트 함수 onResume (화면 활성화시)
+ */
+function onResume() {
+}
+
+/**
+ *  화면 이벤트 함수 onPause (화면 비활성화시)
+ */
+function onPause() {
+}
+</script>
+</body>
+</html>

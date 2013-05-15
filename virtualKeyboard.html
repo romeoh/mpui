@@ -1,0 +1,141 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>  
+<title></title>
+<style type="text/css">
+</style>
+</head>
+
+<body>
+<input type="text" data-keyboard="ko">
+
+<div id="virtualKeyboard">
+<button class="" id="K0">ㄱ</button>
+<button class="" id="K1">ㄲ</button>
+<button class="" id="K3">ㄴ</button>
+<button class="" id="K6">ㄷ</button>
+<button class="" id="K7">ㄸ</button>
+<button class="" id="K8">ㄹ</button>
+<button class="" id="K16">ㅁ</button>
+<button class="" id="K17">ㅂ</button>
+<button class="" id="K18">ㅃ</button>
+<button class="" id="K20">ㅅ</button>
+<button class="" id="K21">ㅆ</button>
+<button class="" id="K22">ㅇ</button>
+<button class="" id="K23">ㅈ</button>
+<button class="" id="K24">ㅉ</button>
+<button class="" id="K25">ㅊ</button>
+<button class="" id="K26">ㅋ</button>
+<button class="" id="K27">ㅌ</button>
+<button class="" id="K28">ㅍ</button>
+<button class="" id="K29">ㅎ</button>
+<hr>
+<button class="" id="K30">ㅏ</button>
+<button class="" id="K31">ㅐ</button>
+<button class="" id="K32">ㅑ</button>
+<button class="" id="K33">ㅒ</button>
+<button class="" id="K34">ㅓ</button>
+<button class="" id="K35">ㅔ</button>
+<button class="" id="K36">ㅕ</button>
+<button class="" id="K37">ㅖ</button>
+<button class="" id="K38">ㅛ</button>
+<button class="" id="K39">ㅘ</button>
+<button class="" id="K40">ㅙ</button>
+<button class="" id="K41">ㅚ</button>
+<button class="" id="K42">ㅛ</button>
+<button class="" id="K43">ㅜ</button>
+<button class="" id="K44">ㅝ</button>
+<button class="" id="K45">ㅞ</button>
+<button class="" id="K46">ㅟ</button>
+<button class="" id="K47">ㅠ</button>
+<button class="" id="K48">ㅡ</button>
+<button class="" id="K49">ㅢ</button>
+<button class="" id="K50">ㅣ</button>
+<hr>
+<button class="" id="K0">ㄱ</button>
+<button class="" id="K1">ㄲ</button>
+<button class="" id="K2">ㄱㅅ</button>
+<button class="" id="K3">ㄴ</button>
+<button class="" id="K4">ㄴㅈ</button>
+<button class="" id="K5">ㄴㅎ</button>
+<button class="" id="K6">ㄷ</button>
+<button class="" id="K7">ㄸ</button>
+<button class="" id="K8">ㄹ</button>
+<button class="" id="K9">ㄹㄱ</button>
+<button class="" id="K10">ㄹㅁ</button>
+<button class="" id="K11">ㄹㅂ</button>
+<button class="" id="K12">ㄹㅅ</button>
+<button class="" id="K13">ㄹㅌ</button>
+<button class="" id="K14">ㄹㅍ</button>
+<button class="" id="K15">ㄹㅎ</button>
+<button class="" id="K16">ㅁ</button>
+<button class="" id="K17">ㅂ</button>
+<button class="" id="K18">ㅃ</button>
+<button class="" id="K19">ㅂㅅ</button>
+<button class="" id="K20">ㅅ</button>
+<button class="" id="K21">ㅆ</button>
+<button class="" id="K22">ㅇ</button>
+<button class="" id="K23">ㅈ</button>
+<button class="" id="K24">ㅉ</button>
+<button class="" id="K25">ㅊ</button>
+<button class="" id="K26">ㅋ</button>
+<button class="" id="K27">ㅌ</button>
+<button class="" id="K28">ㅍ</button>
+<button class="" id="K29">ㅎ</button>
+<hr>
+<button class="" id="S00031"><-</button>
+<button class="" id="S00032">[   ]</button>
+</div>
+<script type="text/javascript" src="mpui.js"></script>
+<script type="text/javascript">
+//http://www.wandel.person.dk/korean.html
+var  virtualKeyboard = document.getElementById('virtualKeyboard')
+	,keys = virtualKeyboard.getElementsByTagName('button')
+
+	,wordArr = []
+	,articleArr = []
+
+for (var i=0; i<keys.length; i++) {
+	keys[i].addEventListener('click', insetKey, false)
+}
+
+// 키이벤트 발생
+function insetKey(evt){
+	keyValue = evt.currentTarget.id.substr(1)
+	charValue = parseInt(keyValue, 10) + 12593;
+	setWordArray(charValue)
+	console.log(String.fromCharCode(charValue))
+}
+
+// 단어를 배열에 넣는다.
+function setWordArray(n){
+	wordArr.push(n);
+}
+
+// 스페이스를 누르면 단어를 완성한다.
+function makeWordComplete(){
+
+}
+
+// 문장을 배열에 넣는다.
+function setArticleArray(n){
+	articleArr.push(n);
+}
+</script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
